@@ -20,7 +20,7 @@ jobs:
   build:
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: xcodegen installieren
         run: brew install xcodegen
       - name: Projekt erzeugen
@@ -35,7 +35,7 @@ jobs:
           cp -R build/Build/Products/Release/MoneyPaperSync.app dist/dmg/
           ln -s /Applications dist/dmg/Applications
           hdiutil create -volname MoneyPaperSync -srcfolder dist/dmg -ov -format UDZO dist/MoneyPaperSync.dmg
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: MoneyPaperSync-dmg-${{ github.run_number }}
           path: dist/MoneyPaperSync.dmg
