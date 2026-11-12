@@ -1,47 +1,84 @@
-# MoneyPaperSync
+<p align="center">
+  <img src="Design-Assets/AppIcon-256.png" alt="MoneyPaperSync" width="128" height="128">
+</p>
 
-Natives macOS-Tool (SwiftUI, macOS 14+): überwacht den MoneyMoney-Statements-Ordner, erkennt Bank/Konto/Zeitraum
-lokal und archiviert die Kontoauszüge in Paperless-ngx. Design: Dark Glass, Logo V4 – Dokumentenfokus, Akzent Blau.
+<h1 align="center">MoneyPaperSync</h1>
 
-## Bauen
+<p align="center">
+  Kontoauszüge aus <b>MoneyMoney</b> automatisch in <b>Paperless-ngx</b> archivieren.<br>
+  Native macOS-App (SwiftUI, macOS 14+) im Dark-Glass-Design.
+</p>
 
-1. `brew install xcodegen`
-2. Im Projektordner (dort liegt `project.yml`): `xcodegen generate`
-3. `open MoneyPaperSync.xcodeproj` → Signing-Team wählen → ⌘R
+---
 
-Das Projekt wurde ohne Xcode geschrieben und **noch nicht kompiliert**. Beim ersten Build sind kleinere
-Compiler-Korrekturen wahrscheinlich. Sprachmodus ist Swift 5 (Toolchain Swift 6/Xcode 16); die Umstellung auf
-Swift-6-Modus steht in `project.yml`.
+## Wofür ist die App?
+
+MoneyMoney legt Kontoauszüge als PDF in einem Ordner ab. MoneyPaperSync überwacht diesen Ordner, erkennt zu jedem PDF **Bank, Konto und Zeitraum** direkt auf deinem Mac und lädt es mit passendem Titel, Korrespondent und Tags in dein Paperless-ngx hoch. Du musst nichts mehr von Hand sortieren oder hochladen.
+
+## Was du damit machen kannst
+
+- **Automatisch archivieren:** Neue PDFs im MoneyMoney-Statements-Ordner werden erkannt, geprüft und nach Paperless-ngx hochgeladen. Ein Dashboard zeigt, ob alles läuft.
+- **Bank, Konto und Zeitraum erkennen:** Die Erkennung liest den Text im PDF (nicht nur den Dateinamen). Konten werden über IBAN, **Kreditkartennummer** (z. B. AMEX) oder **Sparbuchnummer** zugeordnet.
+- **Konten und Banken verwalten:** Eigene Erkennungsmerkmale pro Bank, Konten mit Kontoart (Girokonto, Kreditkarte, Sparbuch, Tagesgeld, …), Paperless-Korrespondent, Tags und Titelvorlage pro Konto. Gängige Banken lassen sich mit einem Klick hinzufügen.
+- **Bereits vorhandene PDFs neu zuordnen:** „Banken zuordnen“ im Dokumente-Tab liest alle PDFs erneut und weist die passende Bank zu, für alle Banken oder nur für eine gewählte. Es wird nichts erneut hochgeladen.
+- **Dokumente prüfen und steuern:** Dokumentenliste mit Suche und Filtern, PDF-Vorschau, Warteschlange mit Fortschritt, erneutes Versuchen, manuelle Zuordnung, Dubletten- und Fehlerbehandlung.
+- **Erstimport festlegen:** Alle vorhandenen PDFs, PDFs ab einem Datum oder nur neue.
+- **Im Hintergrund laufen:** Optionales Menüleisten-Symbol mit Status und Schnellaktionen, Benachrichtigungen bei Importen, Fehlern und Verbindungsverlust.
+- **Sich selbst aktualisieren:** Die App sucht regelmäßig nach neuen Releases, lädt sie und ersetzt sich selbst.
+- **Nachvollziehen:** Protokoll aller Schritte (PDF erkannt, Hash berechnet, Upload, Ergebnis), ohne vollständige IBANs oder Tokens.
+
+## Datenschutz und Sicherheit
+
+- Die Analyse läuft **lokal**. Nur das PDF selbst geht an deinen eigenen Paperless-ngx-Server.
+- Der MoneyMoney-Ordner wird **nur gelesen**, Original-PDFs werden nie verändert (Sandbox, Security-Scoped Bookmark).
+- Der API-Token liegt ausschließlich im **macOS-Schlüsselbund**.
+- IBANs, Karten- und Sparbuchnummern werden nur **maskiert** gespeichert (letzte vier Stellen).
+- Updates sind mit einem Schlüssel signiert, fremde Updates nimmt die App nicht an.
+
+## Installation
+
+1. Lade die neueste `MoneyPaperSync.dmg` von der [Release-Seite](https://github.com/alexanderschubert/moneypapersync/releases/latest).
+2. DMG öffnen und die App nach **Programme** ziehen.
+3. Beim ersten Start auf einem fremden Mac: Rechtsklick → **Öffnen**, denn die App ist nur ad-hoc signiert (kein Entwickler-Zertifikat).
+4. Der Einrichtungsassistent führt durch MoneyMoney-Ordner, Paperless-Zugang, Zuordnung und Erstimport.
+
+Updates kommen danach von selbst (Einstellungen → Allgemein → Updates).
+
+### Einrichtung in Kürze
+
+- **MoneyMoney-Ordner:** „MoneyMoney-Ordner suchen …“ erkennt die installierte MoneyMoney-App und öffnet deren Datenordner. Du bestätigst ihn einmal, die App sucht darin nach Ordnern mit PDFs.
+- **Paperless-ngx:** Server-URL und API-Token eintragen (Token unter „Mein Profil“ in Paperless) und die Verbindung testen.
+
+## Selbst bauen
+
+Voraussetzungen: Xcode (Swift, macOS 14 SDK) und [xcodegen](https://github.com/yonaskolb/XcodeGen).
+
+```bash
+brew install xcodegen
+xcodegen generate
+xcodebuild -scheme MoneyPaperSync -destination 'platform=macOS' build
+```
+
+Danach `MoneyPaperSync.xcodeproj` öffnen und mit ⌘R starten. UI-Tests (`test` statt `build`) brauchen die Freigabe für Bedienungshilfen. Branches und Releases sind in [docs/ENTWICKLUNG.md](docs/ENTWICKLUNG.md) beschrieben. Ein Release baut `scripts/release.sh <Version> <Build> --publish`.
 
 Icons neu erzeugen: `python3 scripts/make_icons.py` (Pillow).
 
-## Struktur
+## Projektstruktur
 
 ```
 MoneyPaperSync/
-  App/        App-Einstieg, AppEnvironment, RootView/MainView
-  Design/     DesignSystem, ColorPalette, Typography, Spacing, GlassStyles, Components/
-  Models/     SwiftData: Bank, Account, StatementDocument, LogEntry + Enums
-  Services/   AppSettings, Keychain, PaperlessClient, PDFAnalyzer, FolderWatcher, SyncEngine, Log/Notifications
-  Views/      Dashboard, Dokumente (+Detail), Warteschlange, Konten, Banken, Protokoll, Einstellungen, Onboarding
-  Resources/  Assets.xcassets (AppIcon, LogoMono)
+  App/        App-Einstieg, Umgebung, Hauptfenster, Menüleiste
+  Design/     Designsystem (Farben, Abstände, Typografie, Glass) und Komponenten
+  Models/     SwiftData-Modelle: Bank, Konto, Dokument, Protokoll
+  Services/   Einstellungen, Schlüsselbund, Paperless-Client, PDF-Analyse, Ordnerüberwachung,
+              Synchronisation, MoneyMoney-Suche, Updater
+  Views/      Dashboard, Dokumente, Warteschlange, Konten, Banken, Protokoll, Einstellungen, Onboarding
+MoneyPaperSyncUITests/   UI-Rauchtests
 ```
 
-## Verhalten
+## Bekannte Grenzen
 
-- Ordner: Sandbox, Security-Scoped Bookmark, **nur Lesezugriff** (Originale bleiben unverändert). Überwachung per
-  FSEvents plus regelmäßiger Abgleich.
-- Analyse (lokal): PDF-Validierung, SHA-256, IBAN-Erkennung (Prüfsumme, nur maskiert gespeichert), Bank per
-  PDF-Text (Dateiname allein führt zu „Manuelle Prüfung“), Zeitraum aus Datumsangaben.
-- Upload: `POST /api/documents/post_document/`, danach Task-Polling (`/api/tasks/`). Standardmäßig 1 paralleler
-  Upload (max. 3), temporäre Fehler werden automatisch nach dem Retry-Intervall wiederholt.
-- Token: ausschließlich im Schlüsselbund. Protokoll wird von IBANs/Tokens bereinigt.
-- Banken: werden nie automatisch angelegt. „Standardbanken hinzufügen“ ist eine ausdrückliche Aktion.
-  Konten werden bei erkannter IBAN automatisch angelegt oder manuell gepflegt.
-
-## Bekannte Grenzen / zu prüfen am Mac
-
-- Kompilierung und UI-Feinschliff (Blur-Performance, Fokus-Ringe, VoiceOver) sind ungetestet.
-- Datums-/Zeitraumerkennung ist heuristisch; bei Fehlern „Erkennung bearbeiten“ nutzen.
-- Paperless-Task-Antworten unterscheiden sich leicht je nach Version (Feld `related_document`).
-- „Beim Anmelden starten“ benötigt eine signierte App (SMAppService).
+- Die Erkennung von Datum und Zeitraum ist heuristisch. Bei Fehlern hilft „Erkennung bearbeiten“.
+- Kartennummern werden nur gefunden, wenn sie im PDF-Text stehen (voll oder teilweise verdeckt).
+- Die Antworten von Paperless-ngx unterscheiden sich leicht je nach Version; die App liest sie tolerant.
+- „Beim Anmelden starten“ braucht eine echte Signatur und funktioniert mit dem ad-hoc-signierten Build voraussichtlich nicht.
