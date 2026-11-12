@@ -37,6 +37,6 @@ jobs:
           hdiutil create -volname MoneyPaperSync -srcfolder dist/dmg -ov -format UDZO dist/MoneyPaperSync.dmg
       - uses: actions/upload-artifact@v4
         with:
-          name: MoneyPaperSync-${{ github.ref_name }}
+          name: MoneyPaperSync-dmg-${{ github.run_number }}
           path: dist/MoneyPaperSync.dmg
           retention-days: 14

@@ -6,19 +6,32 @@ options:
   createIntermediateGroups: true
 settings:
   base:
-    MARKETING_VERSION: "1.0.0"
-    CURRENT_PROJECT_VERSION: "1"
+    MARKETING_VERSION: "1.1.0"
+    CURRENT_PROJECT_VERSION: "2"
     # Swift 6 Toolchain (Xcode 16+), Sprachmodus 5: strikte Concurrency-Prüfung ist
     # absichtlich nicht aktiv, da das Projekt ohne Compiler-Lauf erstellt wurde.
     # Zum Umstellen auf Swift 6 SWIFT_VERSION auf "6" setzen und Warnungen beheben.
     SWIFT_VERSION: "5.0"
     ENABLE_HARDENED_RUNTIME: YES
+packages:
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    from: 2.6.0
 targets:
   MoneyPaperSync:
     type: application
     platform: macOS
     sources:
       - path: MoneyPaperSync
+    dependencies:
+      - package: Sparkle
+    info:
+      path: MoneyPaperSync/Info.plist
+      properties:
+        SUFeedURL: https://github.com/alexanderschubert/moneypapersync/releases/latest/download/appcast.xml
+        SUPublicEDKey: 0neBIJSFgFKvEr+BH6YZFWOYYwFeV5byg7a9NsF7ZsY=
+        SUEnableInstallerLauncherService: true
+        SUEnableAutomaticChecks: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: de.moneypapersync.app

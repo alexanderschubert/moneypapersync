@@ -49,7 +49,8 @@ final class MoneyPaperSyncUITests: XCTestCase {
 
     func testSidebarNavigatesToAllSections() {
         let app = launch(onboardingCompleted: true)
-        XCTAssertTrue(app.buttons["Dokumente"].waitForExistence(timeout: 10))
+        // Mit Badge lautet das Label z. B. „Dokumente, 12“, daher Präfix-Vergleich.
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Dokumente")).firstMatch.waitForExistence(timeout: 10))
         for title in ["Dokumente", "Warteschlange", "Konten", "Banken", "Protokoll", "Dashboard"] {
             let item = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", title)).firstMatch
             XCTAssertTrue(item.exists, "Sidebar-Eintrag \(title) fehlt")
