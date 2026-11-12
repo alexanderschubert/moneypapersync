@@ -6,8 +6,8 @@ options:
   createIntermediateGroups: true
 settings:
   base:
-    MARKETING_VERSION: "1.1.0"
-    CURRENT_PROJECT_VERSION: "2"
+    MARKETING_VERSION: "1.1.1"
+    CURRENT_PROJECT_VERSION: "3"
     # Swift 6 Toolchain (Xcode 16+), Sprachmodus 5: strikte Concurrency-Prüfung ist
     # absichtlich nicht aktiv, da das Projekt ohne Compiler-Lauf erstellt wurde.
     # Zum Umstellen auf Swift 6 SWIFT_VERSION auf "6" setzen und Warnungen beheben.
