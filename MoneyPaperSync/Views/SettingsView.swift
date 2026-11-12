@@ -125,6 +125,26 @@ private struct GeneralSettings: View {
                 }
             }
         }
+        GlassPanel("Updates", systemImage: "arrow.down.circle") {
+            VStack(alignment: .leading, spacing: AppSpacing.md) {
+                Toggle("Automatisch nach Updates suchen", isOn: Binding(
+                    get: { env.updater.automaticallyChecks },
+                    set: { env.updater.automaticallyChecks = $0 }
+                ))
+                Toggle("Updates automatisch laden", isOn: Binding(
+                    get: { env.updater.automaticallyDownloads },
+                    set: { env.updater.automaticallyDownloads = $0 }
+                ))
+                HStack(spacing: AppSpacing.md) {
+                    SecondaryButton(title: "Jetzt nach Updates suchen", systemImage: "arrow.clockwise") {
+                        env.updater.checkForUpdates()
+                    }
+                    .disabled(!env.updater.canCheck)
+                    Text("Version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "–")")
+                        .font(AppFont.caption).foregroundStyle(AppColors.textMuted)
+                }
+            }
+        }
         GlassPanel("System", systemImage: "macwindow") {
             VStack(alignment: .leading, spacing: AppSpacing.md) {
                 Toggle("Beim Anmelden starten", isOn: Binding(

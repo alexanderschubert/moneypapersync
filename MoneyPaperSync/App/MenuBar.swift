@@ -64,6 +64,8 @@ struct MenuBarContent: View {
         }
         .disabled(!env.settings.onboardingCompleted || env.sync.isScanning)
         Button("MoneyPaperSync öffnen") { showMainWindow() }
+        Button("Nach Updates suchen …") { env.updater.checkForUpdates() }
+            .disabled(!env.updater.canCheck)
         Button("Einstellungen …") {
             env.navigate(to: .settings)
             showMainWindow()
