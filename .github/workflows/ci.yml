@@ -1,0 +1,42 @@
+# =============================================================
+# MoneyPaperSync - Build
+# =============================================================
+# Baut die App auf einem macOS-Runner (xcodegen + xcodebuild) und legt das
+# Ergebnis als DMG ab. Die UI-Tests brauchen eine freigegebene Bedienungshilfe
+# und laufen deshalb nur lokal.
+# =============================================================
+name: Build
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: xcodegen installieren
+        run: brew install xcodegen
+      - name: Projekt erzeugen
+        run: xcodegen generate
+      - name: Bauen (Release)
+        run: |
+          xcodebuild -scheme MoneyPaperSync -configuration Release -destination 'platform=macOS' \
+            -derivedDataPath build build
+      - name: DMG erstellen
+        run: |
+          mkdir -p dist/dmg
+          cp -R build/Build/Products/Release/MoneyPaperSync.app dist/dmg/
+          ln -s /Applications dist/dmg/Applications
+          hdiutil create -volname MoneyPaperSync -srcfolder dist/dmg -ov -format UDZO dist/MoneyPaperSync.dmg
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MoneyPaperSync-${{ github.ref_name }}
+          path: dist/MoneyPaperSync.dmg
+          retention-days: 14
