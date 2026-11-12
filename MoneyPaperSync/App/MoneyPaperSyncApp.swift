@@ -58,6 +58,10 @@ struct MoneyPaperSyncApp: App {
                 Button("Einstellungen …") { env.navigate(to: .settings) }
                     .keyboardShortcut(",", modifiers: .command)
             }
+            CommandGroup(after: .appInfo) {
+                Button("Nach Updates suchen …") { env.updater.checkForUpdates() }
+                    .disabled(!env.updater.canCheck)
+            }
             CommandGroup(replacing: .newItem) {}
             CommandMenu("Synchronisation") {
                 Button("Jetzt synchronisieren") {

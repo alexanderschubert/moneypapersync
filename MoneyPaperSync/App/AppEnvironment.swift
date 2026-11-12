@@ -10,6 +10,7 @@ final class AppEnvironment {
     let log: LogService
     let notifier: NotificationService
     let sync: SyncEngine
+    let updater = Updater()
 
     var selection: SidebarItem = .dashboard
     var detailDocument: StatementDocument?

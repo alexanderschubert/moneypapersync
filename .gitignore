@@ -5,3 +5,4 @@ DerivedData/
 .build/
 build-release/
 dist/
+MoneyPaperSync/Info.plist
